@@ -225,13 +225,26 @@ def task_latest():
     ## https://pydoit.org/tasks.html#uptodate and `test_task_latest` in
     ## `src/test_dodo.py`.
     return {
+        # Order matters: settings, pull the latest session + FRED, compute and
+        # append the history row, then rebuild the page from the history.
         "actions": [
-            # TODO: YOUR CODE HERE
+            "python ./src/settings.py",
+            "python ./src/pull_es_options.py --latest",
+            "python ./src/pull_fred.py",
+            "python ./src/monitor.py",
+            "python ./src/build_page.py",
         ],
         "file_dep": [
-            # TODO: YOUR CODE HERE
+            "./src/pull_es_options.py",
+            "./src/pull_fred.py",
+            "./src/monitor.py",
+            "./src/build_page.py",
+            "./src/monitor_chart.py",
+            *ENGINE,
         ],
-        # TODO: YOUR CODE HERE
+        # No targets (it appends to files other tasks own); never up to date,
+        # so the daily update runs every time it is invoked.
+        "uptodate": [False],
         "verbosity": 2,
     }
 
